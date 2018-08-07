@@ -41,6 +41,7 @@ class MemCmd:
         self.desc = desc
 
 
+INT_CMD = MemCmd('set_interrupt', '\x81', 1, 0, 'set interrupt')
 ID_CMD = MemCmd('get_id', '\x85\x00', 0, 2, 'get ID')
 STATUS_CMD = MemCmd('get_status', '\x83\x00', 0, 1, 'get card status')
 CLEAR_STATUS_CMD = MemCmd('clear_status', '\x89', 0, 0, 'clear card status')
@@ -50,6 +51,7 @@ ERASE_SECTOR_CMD = MemCmd('erase_sector', '\xf1', 2, 0, 'erase sector')
 WRITE_BLOCK_CMD = MemCmd('write_block', '\xf2', 4, 0x80, 'write block')
 
 COMMANDS = [
+    INT_CMD,
     ID_CMD,
     STATUS_CMD,
     CLEAR_STATUS_CMD,
@@ -113,14 +115,17 @@ def main():
                 # print '\tblock: %u, offset: %u' % (block, offset)
 
                 y1, y2, y3, y4 = struct.unpack('>BBBB', request)
-                offset = (y1 << 17) + (y2 << 9) + ((y3 << 7) & 3) + (y4 & 0x7F)
+                offset = (y1 << 17) + (y2 << 9) + ((y3 & 3) << 7) + (y4 & 0x7F)
                 print '\toffset: %u' % (offset)
-                aligned = block_align(offset, 512)
+                aligned = block_align(offset, 32)
                 print '\talign: %u (%u)' % (aligned, aligned - offset)
 
                 align_diff = aligned - offset
 
-                outlen = 0x200
+                outlen = 0x200  # if align_diff == 0 else 24
+
+                # buffer time for flash read (32 * 4 bytes)
+                i += 128
             elif cmd.name == 'write_block':
                 print '\tdata: %s' % (hexlify(mosi_stream[end:end+0x80]))
 
