@@ -21,16 +21,6 @@ def block_align(data_size, block_size):
     return block_count(data_size, block_size) * block_size
 
 
-# Command len indata len outdata len Description
-# 0x8500    2 -      -   ID      2   get ID
-# 0x8300    2 -      -   Status  1   get Card Status
-# 0x89      1 -      -   -       -   clear Card Status
-# 0x52      1 offset, 0x00000000 8 Block Data <=0x200 read Block
-# 0xf40000  3----erase Card
-# 0xf1      1 Sector2--erase Sector
-# 0xf2      1 Block offset4Block Data<=0x80write Block
-
-
 class MemCmd:
 
     def __init__(self, name, code, inlen, outlen, desc):
@@ -120,8 +110,9 @@ def main():
                 aligned = block_align(offset, 32)
                 print '\talign: %u (%u)' % (aligned, aligned - offset)
 
-                align_diff = aligned - offset
+                # align_diff = aligned - offset
 
+                # This needs to be controlled by clock/CS signal
                 outlen = 0x200  # if align_diff == 0 else 24
 
                 # buffer time for flash read (32 * 4 bytes)
