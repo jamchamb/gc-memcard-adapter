@@ -57,6 +57,12 @@ for command in COMMANDS:
     COMMAND_TABLE[lookup_byte] = command
 
 
+def unpack_addr(request):
+    y1, y2, y3, y4 = struct.unpack('>BBBB', request)
+    offset = (y1 << 17) + (y2 << 9) + ((y3 & 3) << 7) + (y4 & 0x7F)
+    return offset
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('miso', type=str)
@@ -104,8 +110,7 @@ def main():
                 # block, offset = struct.unpack('>HH', request)
                 # print '\tblock: %u, offset: %u' % (block, offset)
 
-                y1, y2, y3, y4 = struct.unpack('>BBBB', request)
-                offset = (y1 << 17) + (y2 << 9) + ((y3 & 3) << 7) + (y4 & 0x7F)
+                offset = unpack_addr(request)
                 print '\toffset: %u' % (offset)
                 aligned = block_align(offset, 32)
                 print '\talign: %u (%u)' % (aligned, aligned - offset)
@@ -118,7 +123,12 @@ def main():
                 # buffer time for flash read (32 * 4 bytes)
                 i += 128
             elif cmd.name == 'write_block':
+                offset = unpack_addr(request)
+                print '\toffset: %u' % (offset)
                 print '\tdata: %s' % (hexlify(mosi_stream[end:end+0x80]))
+            elif cmd.name == 'erase_sector':
+                offset = unpack_addr(request + '\x00' * 2)
+                print '\toffset: %u' % (offset)
 
             i += cmd.inlen
 
