@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import etao
 import struct
 from binascii import hexlify
 
@@ -137,6 +138,14 @@ def main():
             end = start + outlen
             response = miso_stream[start:end]
             print 'MISO: %s' % (hexlify(response))
+
+            if cmd.name == 'get_status':
+                status = ord(response)
+                print '\tstatus bits', etao.get_bits(status)
+                if status & 1:
+                    print '\tcard ready'
+                if status & 2**7:
+                    print '\tstill erasing(?)'
 
             i += outlen
 
