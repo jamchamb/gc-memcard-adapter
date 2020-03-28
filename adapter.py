@@ -4,6 +4,7 @@ import binascii
 import etao
 import spidev
 import struct
+from tqdm import tqdm
 import time
 import RPi.GPIO as GPIO
 
@@ -248,7 +249,7 @@ def main():
             num_reads += 1
         # print '%u / %u = %u' % (total_size, READ_SZ, total_size / READ_SZ)
         # print 'total reads: %u' % (num_reads)
-        for i in range(num_reads):
+        for i in tqdm(range(num_reads)):
             start_addr = i * READ_SZ
             if start_addr + READ_SZ > total_size:
                 read_amount = (total_size - start_addr) % READ_SZ
@@ -277,22 +278,22 @@ def main():
 
         diff_count = 0
 
-        for i in range(total_size / BLOCK_SZ):
+        for i in tqdm(range(total_size / BLOCK_SZ)):
             pos = i * BLOCK_SZ
             original_sector = original_content[pos:pos + BLOCK_SZ]
             new_sector = new_content[pos:pos + BLOCK_SZ]
 
-            print 'writing block %u of %u' % (i + 1, total_size / BLOCK_SZ)
+            #print 'writing block %u of %u' % (i + 1, total_size / BLOCK_SZ)
 
             if original_sector != new_sector:
                 diff_count += 1
 
-                print 'erase sector @ 0x%04x' % (pos)
+                #print 'erase sector @ 0x%04x' % (pos)
                 erase_sector(spi, pos)
 
                 for j in range(BLOCK_SZ / WRITE_SZ):
                     slice_pos = pos + (j * WRITE_SZ)
-                    print 'write slice @ 0x%08x' % (slice_pos)
+                    #print 'write slice @ 0x%08x' % (slice_pos)
                     new_slice = new_sector[j * WRITE_SZ:(j + 1) * WRITE_SZ]
                     write_page(spi, slice_pos, new_slice)
 
