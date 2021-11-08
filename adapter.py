@@ -194,7 +194,9 @@ def main():
     GPIO.output(GPIO_INT, GPIO.LOW)
 
     # opening sequence?
-    spi.xfer2([0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00], 1000)
+    opener_response = spi.xfer2([0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00], 800000)
+    opener_response = ''.join([chr(x) for x in opener_response])
+    print 'opening sequence:', binascii.hexlify(opener_response)
 
     GPIO.output(GPIO_INT, GPIO.HIGH)
 
