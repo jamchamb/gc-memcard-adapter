@@ -1,3 +1,4 @@
 etao==0.6.0
+RPi.GPIO==0.7.0
 spidev==3.2
 tqdm==4.43.0

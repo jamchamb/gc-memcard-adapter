@@ -4,6 +4,17 @@ Code for reading and writing GameCube memory cards with a Raspberry Pi.
 
 See https://jamchamb.github.io/2018/12/03/gamecube-memory-card-raspi.html
 
+## Setup
+
+```console
+# Enable the SPI interface
+$ sudo raspi-config
+# Install python development library to build py-spidev
+$ sudo apt install python-dev
+# Install python dependencies
+$ pip install -r requirements.txt
+```
+
 ## Usage
 
 To read entire memory card contents to file:
